@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cek Pemahaman 1 - EMILIE | IPA Kelas VII</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fs:16pt;
+  --g900:#103d2a;
+  --g800:#14532d;
+  --g700:#1b7a4a;
+  --g500:#2f9e63;
+  --g200:#bfe3cf;
+  --g100:#e7f5ed;
+  --bg:#f4f9f6;
+  --card:#ffffff;
+  --ink:#17261e;
+  --mut:#4a5d52;
+  --line:#d3e3d9;
+  --sky:#0369a1;
+  --skybg:#e6f3fb;
+  --amb:#b45309;
+  --ambbg:#fff3dc;
+  --red:#b42318;
+  --redbg:#fdecea;
+  --pur:#6d28d9;
+  --purbg:#f1ebfd;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  padding:0;
+  background:#dfece4;
+  color:var(--ink);
+  font-family:'Noto Serif',Georgia,'Times New Roman',serif;
+  font-size:var(--fs);
+  line-height:1.55;
+  -webkit-text-size-adjust:100%;
+}
+body{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  min-height:100vh;
+  padding:12px;
+}
+/* Bingkai aplikasi ukuran 860 x 1240 piksel */
+.app-frame{
+  width:860px;
+  max-width:100%;
+  height:1240px;
+  background:var(--bg);
+  border:2px solid var(--line);
+  border-radius:18px;
+  box-shadow:0 10px 32px rgba(16,61,42,.14);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:relative;
+}
+.stage-head{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px 12px;
+  padding:14px 20px;
+  background:var(--pur);
+  color:#fff;
+  font-weight:700;
+  letter-spacing:.02em;
+  flex-shrink:0;
+}
+.stage-head h1{
+  margin:0;
+  font-size:1.15em;
+  color:#fff;
+  line-height:1.25;
+}
+.stage-head .prog-pill{
+  font-weight:600;
+  font-size:16pt;
+  background:rgba(255,255,255,.22);
+  border-radius:999px;
+  padding:3px 14px;
+  white-space:nowrap;
+}
+/* Kotak identitas hasil cetak (tampil saat nama diisi atau saat cetak) */
+.student-banner{
+  background:var(--g100);
+  border-bottom:2px solid var(--g200);
+  padding:10px 20px;
+  display:none;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:6px 16px;
+  font-size:16pt;
+  color:var(--g900);
+  flex-shrink:0;
+}
+.student-banner.show{
+  display:flex;
+}
+.scroll-area{
+  flex:1;
+  overflow-y:auto;
+  padding:14px 18px 22px;
+}
+.quiz{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:8px 18px 18px;
+  margin:0;
+  box-shadow:0 1px 3px rgba(16,61,42,.05);
+}
+.qc{
+  border-bottom:1.5px dashed var(--line);
+  padding:14px 0;
+  transition:background .2s,border-color .2s;
+}
+.qc:last-of-type{border-bottom:0}
+.qc.unanswered-hl{
+  background:var(--ambbg);
+  border-left:5px solid var(--amb);
+  padding-left:12px;
+  padding-right:8px;
+  border-radius:8px;
+}
+.qs{
+  font-weight:700;
+  margin:.2em 0 .55em;
+  color:var(--g900);
+  font-size:16pt;
+}
+.opt{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  padding:9px 12px;
+  border:1.5px solid var(--line);
+  border-radius:10px;
+  margin:8px 0;
+  cursor:pointer;
+  background:#fff;
+  font-size:16pt;
+}
+.opt:hover{border-color:var(--g500)}
+.opt.ok{background:#e1f5e8;border-color:#2f9e63}
+.opt.bad{background:var(--redbg);border-color:#e07a70}
+input[type=radio]{
+  width:22px;
+  height:22px;
+  margin-top:4px;
+  accent-color:var(--g700);
+  flex:none;
+  cursor:pointer;
+}
+.mrow{
+  display:grid;
+  grid-template-columns:1fr 1.15fr;
+  gap:10px;
+  align-items:center;
+  margin:8px 0;
+  padding:6px 8px;
+  background:#f9fcfa;
+  border-radius:8px;
+  border:1px solid #e3efe7;
+}
+@media(max-width:620px){
+  .mrow{grid-template-columns:1fr}
+}
+select,input[type=text]{
+  width:100%;
+  font-family:'Noto Serif',Georgia,'Times New Roman',serif;
+  font-size:16pt;
+  padding:8px 10px;
+  border:1.5px solid #b9d0c3;
+  border-radius:9px;
+  background:#fff;
+  color:var(--ink);
+}
+select:focus,input[type=text]:focus,button:focus-visible{
+  outline:3px solid #8fd4ae;
+  outline-offset:1px;
+}
+.fb{
+  margin:10px 0 0;
+  padding:10px 14px;
+  border-radius:10px;
+  font-size:16pt;
+  display:none;
+}
+.fb.ok{display:block;background:#e1f5e8;color:#14532d;border-left:5px solid #2f9e63}
+.fb.bad{display:block;background:var(--redbg);color:#7a1d14;border-left:5px solid #e07a70}
+.warn-box{
+  display:none;
+  margin:12px 0;
+  padding:12px 16px;
+  border-radius:10px;
+  background:var(--ambbg);
+  border-left:6px solid var(--amb);
+  color:#78350f;
+  font-weight:600;
+  font-size:16pt;
+}
+.warn-box.show{display:block}
+.qscore{
+  font-weight:700;
+  color:var(--g900);
+  margin:12px 0 4px;
+  padding:12px 16px;
+  background:var(--g100);
+  border-left:6px solid var(--g700);
+  border-radius:10px;
+  display:none;
+  font-size:16pt;
+}
+.qscore.show{display:block}
+.btns{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:16px 0 6px;
+  align-items:center;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:var(--g700);
+  color:#fff;
+  border:0;
+  border-radius:10px;
+  padding:10px 18px;
+  font-family:'Noto Serif',Georgia,'Times New Roman',serif;
+  font-size:16pt;
+  font-weight:700;
+  cursor:pointer;
+  transition:background .15s,opacity .15s,transform .1s;
+}
+.btn:hover{background:var(--g800)}
+.btn.unready{
+  background:#7c9a89;
+  opacity:.78;
+}
+.btn.unready:hover{
+  background:#698776;
+}
+.btn.sec{
+  background:#fff;
+  color:var(--g800);
+  border:1.5px solid var(--g500);
+}
+.btn.sec:hover{background:var(--g100)}
+.btn.prt{
+  background:var(--sky);
+  color:#fff;
+}
+.btn.prt:hover{background:#075985}
+
+/* Modal Input Nama Murid Sebelum Cetak */
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(16,61,42,.55);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  z-index:100;
+}
+.modal-backdrop.open{
+  display:flex;
+}
+.modal-card{
+  background:#fff;
+  border:2px solid var(--g500);
+  border-radius:16px;
+  width:100%;
+  max-width:520px;
+  padding:20px 22px;
+  box-shadow:0 16px 40px rgba(0,0,0,.28);
+}
+.modal-card h2{
+  margin:0 0 8px;
+  font-size:1.15em;
+  color:var(--g900);
+}
+.modal-card p{
+  margin:0 0 12px;
+  font-size:16pt;
+}
+.modal-fld{
+  margin:10px 0;
+}
+.modal-fld label{
+  display:block;
+  font-weight:700;
+  margin-bottom:4px;
+  color:var(--g900);
+}
+.modal-err{
+  display:none;
+  color:var(--red);
+  background:var(--redbg);
+  border-left:4px solid var(--red);
+  padding:8px 12px;
+  border-radius:6px;
+  margin-top:8px;
+  font-weight:600;
+}
+.modal-err.show{display:block}
+
+@media print{
+  @page{size:A4 portrait;margin:12mm}
+  html,body{
+    background:#fff!important;
+    padding:0!important;
+    height:auto!important;
+    overflow:visible!important;
+  }
+  .app-frame{
+    width:100%!important;
+    height:auto!important;
+    border:0!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+  .scroll-area{
+    overflow:visible!important;
+    padding:10px 0!important;
+  }
+  .student-banner{
+    display:flex!important;
+    border:1.5px solid var(--g700)!important;
+    border-radius:10px;
+    margin:10px 0;
+  }
+  .noprint,.btns,.modal-backdrop,.warn-box{
+    display:none!important;
+  }
+  .qc,.opt,.mrow,.fb{
+    break-inside:avoid;
+  }
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="app-frame" role="main">
+  <header class="stage-head">
+    <h1>CEK PEMAHAMAN 1</h1>
+    <span class="prog-pill" id="progText">Terjawab: 0 / 15 soal</span>
+  </header>
+
+  <div class="student-banner" id="studentBanner">
+    <div><b>Nama Murid:</b> <span id="outNama">-</span></div>
+    <div id="wrapKelas"><b>Kelas:</b> <span id="outKelas">-</span></div>
+    <div><b>Waktu Cetak:</b> <span id="outWaktu">-</span></div>
+  </div>
+
+  <div class="scroll-area" id="scrollArea">
+    <div class="quiz" id="quizBox"></div>
+  </div>
+</div>
+
+<!-- Modal Tulis Nama Murid sebelum Cetak ke PDF -->
+<div class="modal-backdrop" id="printModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <h2 id="modalTitle">Cetak Hasil Jawaban ke PDF</h2>
+    <p>Tuliskan nama lengkapmu terlebih dahulu agar tercetak pada lembar hasil jawaban Cek Pemahaman 1.</p>
+    <div class="modal-fld">
+      <label for="inpNama">Nama Murid <span style="color:var(--red)">*</span></label>
+      <input type="text" id="inpNama" placeholder="Ketik nama lengkapmu..." autocomplete="name">
+    </div>
+    <div class="modal-fld">
+      <label for="inpKelas">Kelas (opsional)</label>
+      <input type="text" id="inpKelas" placeholder="Contoh: VII A">
+    </div>
+    <div class="modal-err" id="modalErr">Harap tuliskan namamu terlebih dahulu sebelum melanjutkan mencetak!</div>
+    <div class="btns" style="justify-content:flex-end;margin-top:16px">
+      <button type="button" class="btn sec" id="btnCancelPrint">Batal</button>
+      <button type="button" class="btn prt" id="btnConfirmPrint">&#128424; Lanjutkan Cetak PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  const Q = [
+    {t:'order', q:'Di lereng perbukitan Semende terdapat sebatang pohon kopi, sekumpulan pohon kopi di satu kebun, seluruh tumbuhan dan hewan di lereng tersebut, hingga kesatuan lereng beserta tanah, air hujan, dan udaranya. Urutkan tingkat organisasi kehidupan dari yang paling sederhana (1-6)!', items:['Individu','Populasi','Komunitas','Ekosistem','Bioma','Biosfer'], e:'Urutan dari paling sederhana: individu (satu organisme tunggal), populasi (kumpulan individu sejenis), komunitas (berbagai populasi di suatu area), ekosistem (komunitas beserta lingkungan abiotiknya), bioma, hingga biosfer.'},
+    {t:'mcq', q:'Seluruh rumpun rumput pahitan sejenis yang tumbuh bersama menahan tanah di tepi jalan Desa Sri Tanjung membentuk satu ...',
+     o:[
+       'individu tumbuhan penutup tanah yang hidup mandiri di lereng',
+       'populasi tumbuhan sejenis yang menempati habitat lereng tersebut',
+       'komunitas berbagai jenis tumbuhan yang hidup di tepi jalan desa',
+       'ekosistem daratan perbukitan yang tersusun atas rumput dan tanah'
+     ], a:1, e:'Kumpulan individu sejenis (rumput pahitan) yang hidup di tempat dan waktu yang sama disebut populasi. Individu adalah satu organisme tunggal, komunitas mencakup berbagai jenis populasi, sedangkan ekosistem mencakup komunitas beserta lingkungan abiotiknya.'},
+    {t:'mcq', q:'Saat hujan deras mengguyur perbukitan Semende Darat Tengah, komponen abiotik yang berinteraksi langsung menggerakkan massa tanah di lereng adalah ...',
+     o:[
+       'kelembapan udara pegunungan dan kabut pagi yang menyelimuti permukaan lereng',
+       'perakaran semak belukar dan serasah daun yang melapisi tanah lapisan atas',
+       'curahan air hujan dan kemiringan lereng yang memicu aliran permukaan tanah',
+       'penyinaran cahaya matahari dan hembusan angin sepoi di puncak perbukitan'
+     ], a:2, e:'Curahan air hujan dan kemiringan lereng (topografi) merupakan komponen abiotik yang berinteraksi langsung dengan tanah memicu limpasan permukaan dan pergerakan massa tanah (longsor), sedangkan perakaran semak adalah komponen biotik penahan tanah.'},
+    {t:'mcq', q:'Di halaman sekolah yang tertutup bungkus plastik jajanan, tanah menjadi padat dan kering sehingga cacing tanah jarang ditemukan. Padahal di ekosistem yang sehat, cacing tanah berperan penting sebagai ...',
+     o:[
+       'produsen tanah yang mengikat unsur hara mineral untuk disalurkan langsung ke akar',
+       'konsumen tingkat pertama yang memakan daun rumput segar di permukaan tanah',
+       'pengurai mikroskopis yang mengeluarkan enzim pencerna selulosa di luar tubuhnya',
+       'detritivor tanah yang memakan serasah organik dan menggemburkan pori-pori tanah'
+     ], a:3, e:'Cacing tanah berperan sebagai detritivor yang memakan serpihan serasah organik di dalam tubuhnya dan membuat liang yang menggemburkan pori tanah. Adapun pengurai (dekomposer) adalah jamur dan bakteri yang mencerna bahan organik secara kimiawi dengan enzim.'},
+    {t:'match', q:'Pasangkan setiap komponen biotik di ekosistem lereng perbukitan dengan peran ekologisnya!', p:[['Rumput dan pepohonan','Produsen (mengikat energi cahaya & menahan tanah dengan akar)'],['Belalang pemakan daun rumput','Konsumen tingkat I (herbivora)'],['Cacing tanah dan kaki seribu','Detritivor (pemakan serasah & penggembur tanah)'],['Jamur dan bakteri tanah','Pengurai (mengembalikan zat hara/humus ke tanah)']], e:'Produsen menyediakan energi dan melindungi tanah; herbivora memakan produsen; detritivor menghancurkan serasah; pengurai mengembalikan unsur hara ke tanah untuk diserap kembali oleh produsen.'},
+    {t:'match', q:'Pasangkan komponen abiotik di lereng Semende dengan pengaruhnya terhadap kelangsungan hidup komponen biotik!', p:[['Cahaya matahari','Sumber energi utama bagi rumput untuk berfotosintesis'],['Air hujan dan kelembapan tanah','Menjaga tubuh cacing tanah tetap lembap dan melarutkan hara bagi akar'],['Tanah lapisan atas (berhumus)','Tempat tumbuh akar dan sumber mineral bagi tumbuhan'],['Suhu udara pegunungan','Memengaruhi laju metabolisme dan jenis tanaman yang cocok tumbuh']], e:'Komponen abiotik menentukan kondisi fisik dan kimia tempat komponen biotik tumbuh, bernapas, dan berkembang biak.'},
+    {t:'mcq', q:'Ketika permukaan tanah di taman sekolah tertutup rapat oleh lembaran sampah plastik kemasan jajanan, rumput di bawahnya tampak menguning dan kerdil. Faktor pembatas utama yang menghambat rumput (produsen) tersebut adalah ...',
+     o:[
+       'terhalangnya cahaya matahari untuk fotosintesis dan meresapnya air hujan ke zona akar',
+       'menurunnya kadar gas nitrogen bebas di lapisan udara terbuka sekitar halaman sekolah',
+       'berkurangnya hembusan angin yang membantu penyerbukan bunga rumput di taman sekolah',
+       'meningkatnya persaingan ruang tumbuh antara rumput dengan pepohonan peneduh taman'
+     ], a:0, e:'Lembaran plastik yang menutupi permukaan tanah menghalangi pancaran cahaya matahari ke daun dan menghambat infiltrasi air hujan ke tanah, sehingga cahaya dan air menjadi faktor pembatas utama bagi pertumbuhan rumput.'},
+    {t:'mcq', q:'Bibit rumput yang baru ditanam pada tanah lereng yang kering saat kemarau tampak layu, daunnya menggulung, dan pertumbuhannya melambat, tetapi belum mati. Berdasarkan kurva toleransi, rumput tersebut berada pada ...',
+     o:[
+       'zona optimum karena daun menggulung menandakan laju fotosintesis sedang meningkat pesat',
+       'zona stres fisiologis karena kelembapan tanah mendekati batas minimum kisaran toleransi',
+       'luar batas toleransi minimum karena seluruh jaringan akar rumput telah berhenti menyerap air',
+       'batas maksimum toleransi karena ketersediaan air tanah melampaui kapasitas serap akar'
+     ], a:1, e:'Ketika kelembapan tanah mendekati batas minimum, tumbuhan mengalami cekaman kekeringan (zona stres fisiologis) sehingga daun menggulung untuk mengurangi penguapan dan pertumbuhannya melambat, namun masih bertahan hidup.'},
+    {t:'mcq', q:'Wilayah Semende Darat Tengah berada di dataran tinggi Bukit Barisan sehingga bersuhu lebih sejuk dan berkabut dibanding dataran rendah. Kondisi abiotik ini menyebabkan ...',
+     o:[
+       'laju penguapan air tanah berjalan jauh lebih cepat dibandingkan wilayah pesisir pantai',
+       'seluruh jenis tanaman dataran rendah tumbuh lebih cepat tanpa memerlukan penyesuaian diri',
+       'hanya tumbuhan dan hewan yang toleran terhadap suhu sejuk yang dapat tumbuh secara optimal',
+       'kandungan oksigen dan kelembapan udara di permukaan tanah hilang seluruhnya saat pagi hari'
+     ], a:2, e:'Suhu udara turun sekitar 0,6 °C setiap kenaikan 100 m; faktor abiotik suhu ini menyeleksi jenis organisme sehingga tanaman dataran tinggi (seperti kopi dan sayuran pegunungan) tumbuh optimal sesuai kisaran toleransinya.'},
+    {t:'mcq', q:'Pernyataan: "Peristiwa hujan lebat selama dua jam yang memicu longsor di Desa Sri Tanjung pada sore hari disebut cuaca, sedangkan pola rata-rata hujan tahunan disebut iklim."', o:['Benar','Salah'], a:0, e:'Benar. Hujan lebat dalam beberapa jam adalah cuaca (keadaan udara dalam waktu singkat), sedangkan iklim adalah pola rata-rata cuaca dalam jangka panjang (puluhan tahun).'},
+    {t:'mcq', q:'Mengapa rumput lokal memiliki bentuk adaptasi morfologi yang sangat menguntungkan untuk memulihkan tanah lereng yang terbuka?',
+     o:[
+       'Memiliki akar tunggang tunggal yang lurus ke bawah tanpa percabangan di lapisan tanah atas',
+       'Memiliki daun lebar dan tipis yang memperbesar penguapan air saat terik matahari siang',
+       'Memiliki batang berkayu yang tinggi dan kaku sehingga menahan tiupan angin di puncak bukit',
+       'Memiliki jaringan akar serabut yang halus, banyak, dan rapat untuk mengikat tanah permukaan'
+     ], a:3, e:'Berbeda dengan pohon berakar tunggang dalam, rumput memiliki adaptasi morfologi berupa jaringan akar serabut yang halus dan rapat di lapisan tanah atas (topsoil) serta batang menjalar yang efektif menahan erosi permukaan.'},
+    {t:'mcq', q:'Pernyataan: "Hubungan antara makhluk hidup dan lingkungan bersifat satu arah: tanah dan air memengaruhi tumbuhan, tetapi tumbuhan tidak dapat mengubah sifat tanah dan tata air."', o:['Benar','Salah'], a:1, e:'Salah. Interaksi ekosistem bersifat timbal balik (dua arah): akar tumbuhan mengikat butiran tanah, membuka pori infiltrasi air, dan guguran daunnya membentuk humus yang mengubah kesuburan serta kelembapan tanah.'},
+    {t:'mcq', q:'Setelah hutan di lereng curam ditebang, tumbuhan liar pun sulit tumbuh kembali secara alami karena ...',
+     o:[
+       'aliran air hujan di lereng curam terus mengikis lapisan tanah atas yang kaya humus dan hara',
+       'intensitas cahaya matahari di lahan terbuka menjadi terlalu redup untuk memicu perkecambahan biji',
+       'ketersediaan gas karbon dioksida di udara sekitar lereng habis diserap oleh batuan dasar',
+       'aktivitas cacing tanah dan bakteri pengurai meningkat terlalu cepat pada tanah yang kering'
+     ], a:0, e:'Hilangnya tutupan vegetasi memicu erosi lapisan tanah atas (topsoil) yang menyimpan humus, unsur hara, dan kelembapan; akibatnya tanah yang tersisa menjadi keras dan miskin hara sehingga biji tumbuhan sulit tumbuh.'},
+    {t:'mcq', q:'Alih fungsi hutan menjadi kebun di Semende dan menumpuknya bungkus plastik jajanan di sekolah dikategorikan sebagai Isu Sosio-Saintifik (SSI) karena ...',
+     o:[
+       'penyelesaiannya cukup dilakukan melalui percobaan laboratorium tanpa melibatkan kebiasaan warga',
+       'dampaknya hanya dirasakan oleh komponen biotik hutan tanpa memengaruhi kehidupan masyarakat desa',
+       'pemecahannya berkaitan erat dengan konsep sains ekologi sekaligus pertimbangan ekonomi dan sosial masyarakat',
+       'masalah tersebut terjadi sepenuhnya akibat faktor geologi alamiah tanpa dipengaruhi aktivitas manusia'
+     ], a:2, e:'SSI adalah masalah nyata yang menghubungkan sains (interaksi ekologi, erosi, sifat polimer plastik) dengan dimensi sosial, ekonomi (kebutuhan nafkah petani), dan etika lingkungan sehingga menuntut solusi bersama yang bijaksana.'},
+    {t:'mcq', q:'Berdasarkan kajian Badan Geologi dan konsep ekosistem, mengapa longsor berulang di Semende tidak bisa diselesaikan hanya dengan membersihkan tumpukan tanah di jalan?',
+     o:[
+       'Karena longsor dipicu interaksi hujan deras, lereng curam, dan hilangnya vegetasi pengikat tanah di lereng atas',
+       'Karena pembersihan tanah di jalan raya justru memperbesar sudut kemiringan lereng di seluruh puncak bukit',
+       'Karena tanah yang sudah longsor ke jalan raya kehilangan seluruh mineral lempung dan pasirnya secara permanen',
+       'Karena curah hujan tahunan di dataran tinggi hanya dapat dikurangi dengan memindahkan jalur jalan desa'
+     ], a:0, e:'Membersihkan jalan hanya menangani dampak di hilir; selama interaksi antara curah hujan tinggi, kemiringan lereng, dan berkurangnya vegetasi pengikat tanah di lereng atas belum dipulihkan melalui konservasi, longsor akan terulang.'}
+  ];
+
+  const box = document.getElementById('quizBox');
+  const progText = document.getElementById('progText');
+  const printModal = document.getElementById('printModal');
+  const inpNama = document.getElementById('inpNama');
+  const inpKelas = document.getElementById('inpKelas');
+  const modalErr = document.getElementById('modalErr');
+  const studentBanner = document.getElementById('studentBanner');
+  const outNama = document.getElementById('outNama');
+  const outKelas = document.getElementById('outKelas');
+  const wrapKelas = document.getElementById('wrapKelas');
+  const outWaktu = document.getElementById('outWaktu');
+
+  function esc(s){
+    return String(s).replace(/[&<>"]/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];
+    });
+  }
+
+  function fmt(x, d){
+    if (!isFinite(x)) return '-';
+    d = d == null ? 1 : d;
+    const r = Math.round(x * Math.pow(10, d)) / Math.pow(10, d);
+    let s = r.toFixed(d);
+    if (s.indexOf('.') > -1) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    return s.replace('.', ',');
+  }
+
+  function shuffled(arr, seed){
+    const a = arr.map(function(x, i){ return [x, i]; });
+    let s = seed * 7919 + 13;
+    for (let i = a.length - 1; i > 0; i--){
+      s = (s * 9301 + 49297) % 233280;
+      const j = Math.floor(s / 233280 * (i + 1));
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    if (a.every(function(x, i){ return x[1] === i; })) a.push(a.shift());
+    return a;
+  }
+
+  function renderQuiz(){
+    let h = '';
+    Q.forEach(function(q, i){
+      h += '<div class="qc" data-i="' + i + '" id="qc-' + i + '"><p class="qs">' + (i + 1) + '. ' + q.q + '</p>';
+      if (q.t === 'match'){
+        const opts = shuffled(q.p.map(function(p){ return p[1]; }), i + 3).map(function(x){ return x[0]; });
+        q.p.forEach(function(p, j){
+          h += '<div class="mrow"><span>' + esc(p[0]) + '</span><select data-j="' + j + '" aria-label="' + esc(p[0]) + '"><option value="">Pilih pasangan...</option>' + opts.map(function(o){ return '<option>' + esc(o) + '</option>'; }).join('') + '</select></div>';
+        });
+      } else if (q.t === 'order'){
+        h += shuffled(q.items, i + 7).map(function(pr){
+          return '<div class="mrow"><span>' + esc(pr[0]) + '</span><select data-orig="' + pr[1] + '" aria-label="Urutan ' + esc(pr[0]) + '"><option value="">Urutan ke-</option>' + q.items.map(function(_, k){ return '<option value="' + (k + 1) + '">' + (k + 1) + '</option>'; }).join('') + '</select></div>';
+        }).join('');
+      } else {
+        q.o.forEach(function(o, k){
+          h += '<label class="opt"><input type="radio" name="f1-' + i + '" value="' + k + '"><span>' + o + '</span></label>';
+        });
+      }
+      h += '<div class="fb"></div></div>';
+    });
+    h += '<div class="warn-box" id="warnBox" role="alert"></div>';
+    h += '<div class="btns noprint">' +
+         '<button type="button" class="btn unready" id="btnCheck" data-act="check">Periksa Jawaban</button>' +
+         '<button type="button" class="btn sec" id="btnReset" data-act="reset">Ulangi</button>' +
+         '<button type="button" class="btn prt" id="btnPrint" data-act="print">&#128424; Cetak ke PDF</button>' +
+         '</div>';
+    h += '<div class="qscore" id="qScore" aria-live="polite"></div>';
+    box.innerHTML = h;
+  }
+
+  function getUnanswered(){
+    const missing = [];
+    const qcs = Array.from(box.querySelectorAll('.qc'));
+    qcs.forEach(function(qc, i){
+      const q = Q[i];
+      let complete = false;
+      if (q.t === 'match' || q.t === 'order'){
+        const sels = Array.from(qc.querySelectorAll('select'));
+        complete = sels.every(function(s){ return s.value !== ''; });
+      } else {
+        complete = !!qc.querySelector('input[type=radio]:checked');
+      }
+      if (!complete) missing.push(i + 1);
+    });
+    return missing;
+  }
+
+  function updateStatus(){
+    const missing = getUnanswered();
+    const answered = Q.length - missing.length;
+    progText.textContent = 'Terjawab: ' + answered + ' / ' + Q.length + ' soal';
+    const btnCheck = document.getElementById('btnCheck');
+    const warnBox = document.getElementById('warnBox');
+    if (missing.length === 0){
+      btnCheck.classList.remove('unready');
+      warnBox.classList.remove('show');
+      warnBox.textContent = '';
+    } else {
+      btnCheck.classList.add('unready');
+    }
+    Array.from(box.querySelectorAll('.qc')).forEach(function(qc, idx){
+      if (missing.indexOf(idx + 1) === -1) qc.classList.remove('unanswered-hl');
+    });
+  }
+
+  function checkQuiz(){
+    const missing = getUnanswered();
+    const warnBox = document.getElementById('warnBox');
+    const qcs = Array.from(box.querySelectorAll('.qc'));
+
+    if (missing.length > 0){
+      qcs.forEach(function(qc, idx){
+        qc.classList.toggle('unanswered-hl', missing.indexOf(idx + 1) !== -1);
+      });
+      warnBox.innerHTML = '&#9888;&#65039; <b>Peringatan:</b> Kamu belum menjawab semua soal! Silakan lengkapi dulu <b>Soal nomor ' + missing.join(', ') + '</b> (masih ada ' + missing.length + ' soal yang belum lengkap) agar tombol Periksa Jawaban dapat memproses nilaimu.';
+      warnBox.classList.add('show');
+      const firstMissing = document.getElementById('qc-' + (missing[0] - 1));
+      if (firstMissing) firstMissing.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+
+    warnBox.classList.remove('show');
+    let score = 0;
+    qcs.forEach(function(qc, i){
+      qc.classList.remove('unanswered-hl');
+      const q = Q[i];
+      let ok = 0;
+      if (q.t === 'match'){
+        const sels = Array.from(qc.querySelectorAll('select'));
+        let c = 0;
+        sels.forEach(function(s, j){ if (s.value === q.p[j][1]) c++; });
+        ok = c / q.p.length;
+      } else if (q.t === 'order'){
+        const sels = Array.from(qc.querySelectorAll('select'));
+        let c = 0;
+        sels.forEach(function(s){
+          if (s.value && parseInt(s.value, 10) - 1 === parseInt(s.dataset.orig, 10)) c++;
+        });
+        ok = c / q.items.length;
+      } else {
+        const ch = qc.querySelector('input:checked');
+        ok = ch && parseInt(ch.value, 10) === q.a ? 1 : 0;
+        Array.from(qc.querySelectorAll('.opt')).forEach(function(op, k){
+          op.classList.remove('ok', 'bad');
+          if (k === q.a) op.classList.add('ok');
+          else if (ch && parseInt(ch.value, 10) === k) op.classList.add('bad');
+        });
+      }
+      const fb = qc.querySelector('.fb');
+      fb.className = 'fb ' + (ok === 1 ? 'ok' : 'bad');
+      fb.innerHTML = (ok === 1 ? '<b>Tepat.</b> ' : (ok > 0 ? '<b>Sebagian benar.</b> ' : '<b>Belum tepat.</b> ')) + (q.e || '') + ((q.t === 'mcq' || !q.t) && ok !== 1 ? ' <b>Jawaban tepat: ' + q.o[q.a] + '</b>' : '');
+      score += ok;
+    });
+
+    const n = Q.length, pct = Math.round(score / n * 100);
+    const scEl = document.getElementById('qScore');
+    scEl.textContent = 'Skor: ' + fmt(score, 1) + ' dari ' + n + ' (' + pct + '%). ' + (pct >= 85 ? 'Sangat baik!' : pct >= 60 ? 'Bagus. Periksa kembali bagian yang masih keliru.' : 'Pelajari lagi materinya, lalu coba ulangi.');
+    scEl.classList.add('show');
+    scEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  function resetQuiz(){
+    Array.from(box.querySelectorAll('input[type=radio]')).forEach(function(r){ r.checked = false; });
+    Array.from(box.querySelectorAll('select')).forEach(function(s){ s.value = ''; });
+    Array.from(box.querySelectorAll('.opt')).forEach(function(o){ o.classList.remove('ok', 'bad'); });
+    Array.from(box.querySelectorAll('.qc')).forEach(function(qc){ qc.classList.remove('unanswered-hl'); });
+    Array.from(box.querySelectorAll('.fb')).forEach(function(f){ f.className = 'fb'; f.innerHTML = ''; });
+    const scEl = document.getElementById('qScore');
+    scEl.classList.remove('show');
+    scEl.textContent = '';
+    const warnBox = document.getElementById('warnBox');
+    warnBox.classList.remove('show');
+    warnBox.textContent = '';
+    updateStatus();
+    document.getElementById('scrollArea').scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function openPrintModal(){
+    modalErr.classList.remove('show');
+    printModal.classList.add('open');
+    setTimeout(function(){ inpNama.focus(); }, 50);
+  }
+
+  function closePrintModal(){
+    printModal.classList.remove('open');
+  }
+
+  function confirmPrint(){
+    const nama = inpNama.value.trim();
+    const kelas = inpKelas.value.trim();
+    if (!nama){
+      modalErr.classList.add('show');
+      inpNama.focus();
+      return;
+    }
+    outNama.textContent = nama;
+    if (kelas){
+      outKelas.textContent = kelas;
+      wrapKelas.style.display = '';
+    } else {
+      wrapKelas.style.display = 'none';
+    }
+    outWaktu.textContent = new Date().toLocaleString('id-ID', {
+      day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
+    });
+    studentBanner.classList.add('show');
+    closePrintModal();
+    setTimeout(function(){ window.print(); }, 150);
+  }
+
+  renderQuiz();
+  updateStatus();
+
+  box.addEventListener('change', updateStatus);
+  box.addEventListener('click', function(e){
+    const b = e.target.closest('button[data-act]');
+    if (!b) return;
+    const act = b.dataset.act;
+    if (act === 'check') checkQuiz();
+    else if (act === 'reset') resetQuiz();
+    else if (act === 'print') openPrintModal();
+  });
+
+  document.getElementById('btnCancelPrint').addEventListener('click', closePrintModal);
+  document.getElementById('btnConfirmPrint').addEventListener('click', confirmPrint);
+  inpNama.addEventListener('input', function(){
+    if (inpNama.value.trim()) modalErr.classList.remove('show');
+  });
+  printModal.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') closePrintModal();
+    else if (e.key === 'Enter'){
+      e.preventDefault();
+      confirmPrint();
+    }
+  });
+})();
+</script>
+</body>
+</html>

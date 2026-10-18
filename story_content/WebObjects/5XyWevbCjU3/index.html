@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glosarium Ekologi & Rekayasa</title>
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat Google Fonts: Noto Serif -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Pengaturan Global: Font Noto Serif, Warna Hitam Pekat (#000000), Minimal 16pt */
+        * {
+            font-family: 'Noto Serif', serif;
+            color: #000000;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #eef7ef;
+            margin: 0;
+            padding: 16px;
+            font-size: 16pt;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Ukuran minimal 16pt untuk seluruh elemen teks */
+        .text-min-16pt {
+            font-size: 16pt;
+            line-height: 1.55;
+            color: #000000;
+        }
+
+        /* Ukuran 18pt tebal untuk judul istilah glosarium */
+        .text-title-18pt {
+            font-size: 18pt;
+            line-height: 1.4;
+            color: #000000;
+        }
+
+        /* Placeholder tetap berwarna hitam (#000000) */
+        input::placeholder {
+            color: #000000;
+            opacity: 0.65;
+        }
+
+        /* Kontainer Potret Tepat 780 x 1000 Pixel dengan Garis Bingkai Hijau Muda */
+        .portrait-frame {
+            width: 780px;
+            height: 1000px;
+            max-width: 100%;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px -15px rgba(74, 222, 128, 0.35);
+            border: 4px solid #66BB6A;
+            flex-shrink: 0;
+        }
+
+        /* Kelas khusus untuk garis bingkai hijau muda */
+        .frame-light-green {
+            border-color: #66BB6A;
+        }
+
+        .divider-light-green {
+            border-color: #81C784;
+        }
+
+        /* Kustomisasi Scrollbar dengan warna hijau muda */
+        .glossary-scroll::-webkit-scrollbar {
+            width: 10px;
+        }
+        .glossary-scroll::-webkit-scrollbar-track {
+            background: #f1f8f2;
+        }
+        .glossary-scroll::-webkit-scrollbar-thumb {
+            background: #66BB6A;
+            border-radius: 9999px;
+            border: 2px solid #f1f8f2;
+        }
+        .glossary-scroll::-webkit-scrollbar-thumb:hover {
+            background: #4caf50;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Kontainer Aplikasi Ukuran Tetap 780 x 1000 Pixel -->
+    <main class="portrait-frame">
+        
+        <!-- Bagian Paling Atas: Kolom Pencarian -->
+        <header class="bg-white border-b-2 frame-light-green p-5 shrink-0 z-10 shadow-sm">
+            <div class="mb-3 flex items-center justify-between">
+                <h1 class="text-title-18pt font-bold tracking-tight">Glosarium</h1>
+                <span id="counterBadge" class="text-min-16pt font-semibold bg-[#E8F5E9] border-2 frame-light-green px-4 py-0.5 rounded-xl">
+                    72 Kata
+                </span>
+            </div>
+
+            <!-- Kotak Input Pencarian dengan Bingkai Hijau Muda -->
+            <div class="relative flex items-center">
+                <!-- Ikon Cari SVG (Hitam) -->
+                <svg class="w-6 h-6 absolute left-4 pointer-events-none" fill="none" stroke="#000000" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z"></path>
+                </svg>
+
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Ketik kata yang ingin dicari..." 
+                    autocomplete="off"
+                    aria-label="Cari kata glosarium"
+                    class="w-full pl-12 pr-12 py-3 bg-[#F9FBF9] border-2 frame-light-green rounded-2xl text-min-16pt focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#4ade80] transition-all"
+                >
+
+                <!-- Tombol Hapus Teks Pencarian -->
+                <button 
+                    id="clearBtn" 
+                    type="button"
+                    title="Hapus pencarian"
+                    aria-label="Hapus pencarian"
+                    class="hidden absolute right-3 p-1.5 rounded-xl hover:bg-[#E8F5E9] active:scale-95 transition"
+                >
+                    <svg class="w-6 h-6" fill="none" stroke="#000000" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Area Daftar Glosarium Tepat di Bawah Kotak Pencarian -->
+        <section id="glossaryContainer" class="glossary-scroll flex-1 overflow-y-auto p-5 space-y-4 bg-[#F6FBF6]">
+            <!-- Daftar kata akan dirender di sini oleh JavaScript -->
+        </section>
+
+        <!-- Pesan Keterangan Jika Kata Tidak Ditemukan (Muncul Langsung di Bawah Kotak Pencarian) -->
+        <section id="emptyState" class="hidden flex-1 flex flex-col items-center justify-start p-5 bg-[#F6FBF6]">
+            <div class="bg-white border-2 frame-light-green rounded-2xl p-6 shadow-sm w-full text-center">
+                <p class="text-min-16pt font-bold">
+                    Kata yang kamu cari tidak ada
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Data lengkap 72 kata dan kalimat penjelasannya
+        const glossaryData = [
+            {
+                term: "3R (Reduce, Reuse, Recycle)",
+                definition: "Mengurangi, memakai ulang, dan mendaur ulang sampah, dengan urutan prioritas dari mengurangi."
+            },
+            {
+                term: "Abiotik",
+                definition: "Komponen ekosistem yang tidak hidup, seperti cahaya, udara, iklim, suhu, kelembapan, air, tanah, dan topografi."
+            },
+            {
+                term: "Adaptasi",
+                definition: "Penyesuaian diri makhluk hidup terhadap lingkungannya agar dapat bertahan hidup dan berkembang biak; dapat berupa adaptasi morfologi, fisiologi, atau tingkah laku."
+            },
+            {
+                term: "Afeksi",
+                definition: "Komponen sikap yang berkaitan dengan perasaan dan kepedulian, misalnya rasa prihatin terhadap kerusakan lingkungan."
+            },
+            {
+                term: "Alih fungsi lahan",
+                definition: "Perubahan peruntukan suatu lahan, misalnya hutan menjadi kebun atau lahan pertanian."
+            },
+            {
+                term: "Autotrof",
+                definition: "Organisme yang membuat makanannya sendiri dari bahan anorganik, misalnya tumbuhan hijau melalui fotosintesis."
+            },
+            {
+                term: "Batasan (constraint)",
+                definition: "Syarat atau keterbatasan yang harus dipatuhi dalam merancang solusi, misalnya bahan, ukuran, waktu, dan keselamatan."
+            },
+            {
+                term: "Bioma",
+                definition: "Kelompok besar ekosistem di wilayah luas yang beriklim dan bervegetasi dominan serupa, misalnya hutan hujan tropis."
+            },
+            {
+                term: "Biosfer",
+                definition: "Seluruh bagian bumi yang dihuni makhluk hidup, meliputi daratan, perairan, dan lapisan udara bagian bawah."
+            },
+            {
+                term: "Biotik",
+                definition: "Komponen ekosistem yang hidup: produsen, konsumen, detritivor, dan pengurai."
+            },
+            {
+                term: "Cuaca",
+                definition: "Keadaan udara di suatu tempat dalam waktu singkat (jam atau hari), misalnya hujan lebat hari ini."
+            },
+            {
+                term: "Daur biogeokimia",
+                definition: "Perpindahan zat seperti air, karbon, dan oksigen antara makhluk hidup dan lingkungan tak hidup."
+            },
+            {
+                term: "Daur ulang",
+                definition: "Pengolahan atau pemanfaatan kembali limbah menjadi barang yang berguna."
+            },
+            {
+                term: "Detritivor",
+                definition: "Organisme pemakan sisa makhluk hidup dan serasah, misalnya cacing tanah dan kaki seribu."
+            },
+            {
+                term: "EDP (Engineering Design Process)",
+                definition: "Siklus rekayasa: Ask (bertanya), Imagine (membayangkan), Plan (merencanakan), Create-Test-Improve (membuat, menguji, menyempurnakan), dan Share (membagikan)."
+            },
+            {
+                term: "Ekologi",
+                definition: "Ilmu yang mempelajari hubungan timbal balik antara makhluk hidup dan lingkungannya."
+            },
+            {
+                term: "Ekosistem",
+                definition: "Hubungan timbal balik antara makhluk hidup (biotik) dan lingkungannya (abiotik)."
+            },
+            {
+                term: "Erosi",
+                definition: "Terlepasnya partikel tanah dari tempatnya lalu terangkut oleh air atau angin."
+            },
+            {
+                term: "Erosi percik",
+                definition: "Terlepas dan terpercikknya partikel tanah akibat hantaman butir hujan pada tanah terbuka."
+            },
+            {
+                term: "Evaporasi",
+                definition: "Perubahan air menjadi uap air karena panas, misalnya akibat cahaya matahari."
+            },
+            {
+                term: "Faktor pembatas",
+                definition: "Faktor lingkungan yang paling mendekati atau melampaui batas toleransi organisme sehingga membatasi tempat hidup atau pertumbuhannya."
+            },
+            {
+                term: "Fotosintesis",
+                definition: "Proses tumbuhan hijau membuat makanan dari air dan karbon dioksida dengan bantuan cahaya, menghasilkan oksigen."
+            },
+            {
+                term: "Geocell",
+                definition: "Struktur sel tiga dimensi seperti sarang lebah dari strip polimer yang diisi tanah dan sering ditanami rumput untuk menahan tanah pada lereng."
+            },
+            {
+                term: "Habitat",
+                definition: "Tempat hidup suatu organisme beserta kondisi lingkungannya."
+            },
+            {
+                term: "Herbivori",
+                definition: "Hubungan antara hewan pemakan tumbuhan dan tumbuhan yang dimakannya."
+            },
+            {
+                term: "Heterotrof",
+                definition: "Organisme yang tidak dapat membuat makanan sendiri dan memperoleh makanan dari organisme lain."
+            },
+            {
+                term: "Humus",
+                definition: "Bahan organik tanah berwarna gelap hasil penguraian sisa makhluk hidup; membuat tanah subur dan gembur."
+            },
+            {
+                term: "Ideation",
+                definition: "Proses menghasilkan banyak gagasan solusi sebelum memilih yang terbaik."
+            },
+            {
+                term: "Iklim",
+                definition: "Pola cuaca (suhu, hujan, kelembapan) di suatu wilayah dalam jangka panjang, biasanya puluhan tahun."
+            },
+            {
+                term: "Individu",
+                definition: "Satu makhluk hidup; tingkat organisasi kehidupan yang paling sederhana."
+            },
+            {
+                term: "Infiltrasi",
+                definition: "Peresapan air hujan ke dalam tanah."
+            },
+            {
+                term: "Interlocking (saling mengunci)",
+                definition: "Penguncian antar bagian anyaman pada titik silang sehingga tidak mudah bergeser, melar, atau lepas."
+            },
+            {
+                term: "Karnivora",
+                definition: "Hewan pemakan daging (hewan lain), misalnya katak, ular, dan elang."
+            },
+            {
+                term: "Kisaran toleransi",
+                definition: "Rentang nilai suatu faktor lingkungan (misalnya suhu) yang masih dapat ditahan organisme, dari batas minimum sampai maksimum, dengan kondisi optimum di antaranya."
+            },
+            {
+                term: "Kognisi",
+                definition: "Komponen sikap yang berkaitan dengan pengetahuan dan pemahaman."
+            },
+            {
+                term: "Kohesi",
+                definition: "Daya ikat antar partikel tanah; akar tumbuhan meningkatkan kohesi tanah."
+            },
+            {
+                term: "Komensalisme",
+                definition: "Simbiosis yang menguntungkan satu pihak tanpa merugikan pihak lain."
+            },
+            {
+                term: "Kompetisi",
+                definition: "Persaingan antar organisme untuk memperebutkan sumber daya, misalnya cahaya, air, atau makanan."
+            },
+            {
+                term: "Komunitas",
+                definition: "Kumpulan populasi berbagai jenis makhluk hidup yang berinteraksi di suatu tempat."
+            },
+            {
+                term: "Konasi",
+                definition: "Komponen sikap yang berkaitan dengan kecenderungan bertindak nyata."
+            },
+            {
+                term: "Konservasi",
+                definition: "Upaya menjaga dan melindungi sumber daya alam agar tetap lestari."
+            },
+            {
+                term: "Konsumen",
+                definition: "Organisme yang memperoleh energi dengan memakan organisme lain."
+            },
+            {
+                term: "Kontrol (model kontrol)",
+                definition: "Model pembanding yang dibuat sama dengan model uji tetapi tanpa perlakuan, dalam proyek ini tanpa Geocell."
+            },
+            {
+                term: "Kriteria",
+                definition: "Ukuran yang dipakai untuk menilai keberhasilan suatu solusi."
+            },
+            {
+                term: "Limpasan",
+                definition: "Air hujan yang mengalir di permukaan tanah karena tidak sempat meresap (aliran permukaan, run-off)."
+            },
+            {
+                term: "Longsor",
+                definition: "Gerakan massa tanah atau batuan menuruni lereng."
+            },
+            {
+                term: "Luas terbuka",
+                definition: "Persentase luas seluruh lubang terhadap luas panel anyaman."
+            },
+            {
+                term: "Mikroplastik",
+                definition: "Serpihan plastik berukuran sangat kecil yang mudah menyebar di tanah dan air."
+            },
+            {
+                term: "Monokultur",
+                definition: "Penanaman satu jenis tanaman pada lahan yang luas."
+            },
+            {
+                term: "Multilayer",
+                definition: "Kemasan yang tersusun atas beberapa lapisan bahan berbeda sehingga sulit didaur ulang."
+            },
+            {
+                term: "Mutualisme",
+                definition: "Simbiosis yang menguntungkan kedua pihak."
+            },
+            {
+                term: "Omnivora",
+                definition: "Hewan pemakan tumbuhan sekaligus hewan, misalnya tikus dan manusia."
+            },
+            {
+                term: "Parasitisme",
+                definition: "Simbiosis yang menguntungkan satu pihak dan merugikan pihak lain."
+            },
+            {
+                term: "Penghijauan",
+                definition: "Penanaman kembali tumbuhan pada lahan terbuka atau lahan kritis."
+            },
+            {
+                term: "Pengurai",
+                definition: "Organisme, misalnya jamur dan bakteri, yang menguraikan bahan organik mati menjadi zat hara."
+            },
+            {
+                term: "Polimer",
+                definition: "Molekul berantai sangat panjang; bahan dasar plastik."
+            },
+            {
+                term: "Polya (empat langkah)",
+                definition: "Kerangka pemecahan masalah: memahami masalah, merencanakan penyelesaian, melaksanakan rencana, dan memeriksa kembali."
+            },
+            {
+                term: "Populasi",
+                definition: "Kumpulan individu sejenis yang hidup di tempat dan waktu yang sama."
+            },
+            {
+                term: "Predasi",
+                definition: "Hubungan pemangsa yang memakan mangsanya."
+            },
+            {
+                term: "Produsen",
+                definition: "Organisme yang membuat makanannya sendiri melalui fotosintesis, misalnya rumput dan pohon."
+            },
+            {
+                term: "Purwarupa (prototipe)",
+                definition: "Wujud awal suatu rancangan yang dibuat untuk diuji dan disempurnakan."
+            },
+            {
+                term: "Rantai makanan",
+                definition: "Urutan makan dan dimakan dari produsen ke konsumen."
+            },
+            {
+                term: "Jaring-jaring makanan",
+                definition: "Gabungan beberapa rantai makanan yang saling bersilang dalam suatu ekosistem."
+            },
+            {
+                term: "Serasah",
+                definition: "Lapisan daun, ranting, dan sisa tumbuhan yang gugur di permukaan tanah."
+            },
+            {
+                term: "Sedimen",
+                definition: "Partikel tanah yang terangkut air lalu mengendap; proses pengendapannya disebut sedimentasi."
+            },
+            {
+                term: "Simbiosis",
+                definition: "Hidup berdampingan secara erat antara dua jenis organisme: mutualisme, komensalisme, atau parasitisme."
+            },
+            {
+                term: "SSI (Socio-Scientific Issues)",
+                definition: "Isu sosio-saintifik: masalah nyata yang melibatkan sains sekaligus pertimbangan sosial, ekonomi, dan etika, sehingga tidak punya jawaban tunggal."
+            },
+            {
+                term: "Topografi",
+                definition: "Bentuk permukaan bumi, seperti kemiringan dan ketinggian tempat."
+            },
+            {
+                term: "Trade-off",
+                definition: "Keadaan harus memilih di antara dua hal yang saling bertentangan, misalnya lubang kecil menahan tanah lebih baik tetapi memberi ruang tumbuh yang sempit bagi rumput."
+            },
+            {
+                term: "Transpirasi",
+                definition: "Penguapan air dari tumbuhan melalui daun."
+            },
+            {
+                term: "Vegetasi",
+                definition: "Seluruh tumbuhan yang menutupi suatu area."
+            },
+            {
+                term: "Variabel kontrol",
+                definition: "Hal-hal yang dijaga tetap sama dalam percobaan agar perbandingan hasil adil."
+            }
+        ];
+
+        // Referensi Elemen DOM
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearBtn');
+        const glossaryContainer = document.getElementById('glossaryContainer');
+        const emptyState = document.getElementById('emptyState');
+        const counterBadge = document.getElementById('counterBadge');
+
+        // Fungsi untuk mengamankan karakter khusus regex saat menyorot kata pencarian
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Fungsi untuk memberi sorotan hijau muda pada kata yang cocok dengan teks tetap hitam (#000000)
+        function highlightText(text, query) {
+            if (!query.trim()) return text;
+            const safeQuery = escapeRegExp(query.trim());
+            const regex = new RegExp(`(${safeQuery})`, 'gi');
+            return text.replace(regex, '<mark class="bg-[#C8E6C9] font-semibold px-1 rounded">$1</mark>');
+        }
+
+        // Fungsi untuk merender daftar glosarium ke layar
+        function renderGlossary(query = '') {
+            const trimmedQuery = query.trim().toLowerCase();
+
+            // Menyaring kata berdasarkan kecocokan pada istilah (term) maupun penjelasan (definition)
+            const filtered = glossaryData.filter(item => {
+                return (
+                    item.term.toLowerCase().includes(trimmedQuery) ||
+                    item.definition.toLowerCase().includes(trimmedQuery)
+                );
+            }).sort((a, b) => {
+                if (!trimmedQuery) return 0;
+                const aStarts = a.term.toLowerCase().startsWith(trimmedQuery);
+                const bStarts = b.term.toLowerCase().startsWith(trimmedQuery);
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+                return 0;
+            });
+
+            // Perbarui jumlah kata yang tampil
+            counterBadge.textContent = `${filtered.length} Kata`;
+
+            // Tampilkan atau sembunyikan tombol hapus (X)
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+
+            // Jika kata yang dicari tidak ada, tampilkan pesan tepat di bawah kotak pencarian
+            if (filtered.length === 0) {
+                glossaryContainer.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            // Jika ada hasil, tampilkan daftar dan sembunyikan pesan kosong
+            emptyState.classList.add('hidden');
+            glossaryContainer.classList.remove('hidden');
+
+            // Buat kartu HTML untuk setiap item glosarium dengan garis bingkai hijau muda
+            glossaryContainer.innerHTML = filtered.map(item => `
+                <article class="bg-white border-2 frame-light-green rounded-2xl p-4 shadow-sm transition hover:bg-[#F1F8E9]">
+                    <h2 class="text-title-18pt font-bold mb-1.5 border-b-2 divider-light-green pb-1.5">
+                        ${highlightText(item.term, query)}
+                    </h2>
+                    <p class="text-min-16pt">
+                        ${highlightText(item.definition, query)}
+                    </p>
+                </article>
+            `).join('');
+
+            // Kembalikan posisi gulir ke paling atas setiap kali hasil pencarian berubah
+            glossaryContainer.scrollTop = 0;
+        }
+
+        // Event listener saat pengguna mengetik di kotak pencarian
+        searchInput.addEventListener('input', (e) => {
+            renderGlossary(e.target.value);
+        });
+
+        // Event listener untuk tombol hapus pencarian
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            renderGlossary('');
+            searchInput.focus();
+        });
+
+        // Inisialisasi tampilan awal saat halaman selesai dimuat
+        window.onload = function () {
+            renderGlossary();
+        };
+    </script>
+</body>
+</html>

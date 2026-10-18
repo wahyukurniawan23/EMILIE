@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Virtual: Pengaruh Tutupan Lahan pada Erosi Tanah</title>
+    
+    <!-- Memuat Tailwind CSS untuk Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        /* Container Simulasi */
+        .simulation-area {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 60%, #f3f4f6 100%);
+        }
+
+        /* Nampan Tanah / Lereng */
+        .slope-container {
+            position: absolute;
+            right: 25%;
+            bottom: 120px; /* Tepat berada di atas gelas beker (20px bottom + 100px tinggi gelas) */
+            width: 90%;
+            height: 100px;
+            background-color: #8B5A2B;
+            border-radius: 10px;
+            /* Ubah titik rotasi ke kanan bawah agar ujungnya menempel saat berputar */
+            transform-origin: bottom right;
+            transition: transform 0.5s ease-in-out, background-color 0.5s;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            border-bottom: 20px solid #5C3A21;
+        }
+
+        /* Lapisan Rumput */
+        .grass-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 15px;
+            background-color: #4CAF50;
+            border-radius: 10px 10px 0 0;
+            transition: opacity 0.3s;
+            box-shadow: inset 0 -2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Gelas Penampung (Beaker) */
+        .beaker {
+            position: absolute;
+            bottom: 20px;
+            /* Posisikan persis di tengah titik tumpu (ujung kanan) lereng. Jika lebar 150px, geser ke kanan 75px */
+            right: calc(25% - 75px);
+            width: 150px;
+            height: 100px;
+            border: 4px solid rgba(255, 255, 255, 0.8);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.5), 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        /* Air di dalam Beaker */
+        .liquid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%; /* Diubah oleh JS */
+            background-color: transparent;
+            transition: height 2.5s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 1s;
+        }
+
+        /* Animasi Hujan (Dibuat via JS, di-style disini) */
+        .raindrop {
+            position: absolute;
+            width: 2px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.6);
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-20px); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(300px); opacity: 0; }
+        }
+
+        /* Efek Tanah Rusak */
+        .soil-damage {
+            position: absolute;
+            background: #5C3A21;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+
+        /* Awan */
+        .cloud {
+            position: absolute;
+            top: 10%;
+            width: 120px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50px;
+            box-shadow: 0 8px 5px rgba(0, 0, 0, 0.1);
+            opacity: 0.9;
+        }
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+        }
+        .cloud::before {
+            width: 50px; height: 50px;
+            top: -20px; left: 15px;
+        }
+        .cloud::after {
+            width: 70px; height: 70px;
+            top: -30px; right: 15px;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-300 flex items-center justify-center p-4">
+
+    <!-- Kontainer Lab Fixed Size (800x600) -->
+    <div id="lab-container" class="bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col" style="width: 800px; height: 600px;">
+        
+        <header class="text-center p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+            <h1 class="text-2xl font-bold text-gray-800 mb-1">Laboratorium Maya: Erosi Tanah</h1>
+            <p class="text-gray-600 text-xs">Eksplorasi bagaimana tutupan lahan dan kemiringan lereng mempengaruhi tingkat erosi saat hujan.</p>
+        </header>
+
+        <main class="flex flex-row flex-grow overflow-hidden bg-white">
+            
+            <!-- Sidebar Kiri (Kontrol & Hasil) -->
+            <div class="w-[280px] p-4 flex flex-col gap-4 border-r border-gray-200 overflow-y-auto flex-shrink-0">
+                
+                <!-- Kartu Pengaturan -->
+                <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                    <h2 class="text-sm font-semibold mb-3 text-gray-700 border-b pb-2">Panel Kontrol</h2>
+                    
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Tutupan Tanah</label>
+                        <select id="tutupan" onchange="updateVisuals()" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 text-sm border bg-gray-50 text-gray-800">
+                            <option value="rumput">Tanah Berumput (Vegetasi)</option>
+                            <option value="gundul">Tanah Gundul (Terbuka)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Kemiringan Lereng</label>
+                        <select id="kemiringan" onchange="updateVisuals()" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 text-sm border bg-gray-50 text-gray-800">
+                            <option value="landai">Landai (10°)</option>
+                            <option value="curam">Curam (25°)</option>
+                        </select>
+                    </div>
+
+                    <button id="btn-simulasi" onclick="jalankanSimulasi()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 px-3 rounded-lg shadow transition-all transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                        Turunkan Hujan!
+                    </button>
+                </div>
+
+                <!-- Kartu Hasil -->
+                <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 relative overflow-hidden flex-grow">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-gray-300" id="indikator-hasil"></div>
+                    <h2 class="text-sm font-semibold mb-3 text-gray-700 border-b pb-2">Hasil Pengamatan</h2>
+                    
+                    <ul class="space-y-3">
+                        <li class="flex flex-col">
+                            <span class="text-xs text-gray-500">Tanah Terbawa (Massa)</span>
+                            <span class="font-bold text-gray-800 text-lg"><span id="hasil-massa">0</span> <span class="text-xs font-normal text-gray-500">gram</span></span>
+                        </li>
+                        <li class="flex flex-col items-start">
+                            <span class="text-xs text-gray-500 mb-1">Kekeruhan Air</span>
+                            <span id="hasil-keruh" class="font-semibold px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">-</span>
+                        </li>
+                        <li class="flex flex-col">
+                            <span class="text-xs text-gray-500">Kondisi Permukaan</span>
+                            <span id="hasil-kondisi" class="font-semibold text-sm text-gray-700">-</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Area Kanan (Animasi) -->
+            <div class="flex-grow bg-gray-50 p-4 flex flex-col">
+                <div class="flex justify-between items-center px-2 pb-2">
+                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Area Animasi</span>
+                    <span id="status-simulasi" class="text-xs text-blue-500 font-medium opacity-0 transition-opacity">Memproses...</span>
+                </div>
+                
+                <div class="simulation-area w-full flex-grow rounded-xl border border-gray-300 shadow-inner">
+                    <!-- Awan -->
+                    <div class="cloud" style="left: 20%;"></div>
+                    <div class="cloud" style="left: 50%;"></div>
+                    
+                    <!-- Lereng Tanah -->
+                    <div id="lereng" class="slope-container">
+                        <div id="rumput" class="grass-layer"></div>
+                        <!-- Partikel Kerusakan Tanah (muncul saat simulasi) -->
+                        <div class="soil-damage" style="top:20px; left:30%; width:40px; height:20px;"></div>
+                        <div class="soil-damage" style="top:40px; left:60%; width:60px; height:30px;"></div>
+                        <div class="soil-damage" style="top:10px; left:80%; width:50px; height:25px;"></div>
+                    </div>
+
+                    <!-- Gelas Beker -->
+                    <div class="beaker">
+                        <div id="air-tampungan" class="liquid"></div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        let isSimulating = false;
+        let rainInterval;
+
+        // Inisialisasi visual saat halaman dimuat
+        document.addEventListener("DOMContentLoaded", () => {
+            updateVisuals();
+        });
+
+        // Update visual lereng dan tanah secara real-time saat dropdown diubah
+        function updateVisuals() {
+            if (isSimulating) return;
+
+            const tutupan = document.getElementById("tutupan").value;
+            const kemiringan = document.getElementById("kemiringan").value;
+            const lereng = document.getElementById("lereng");
+            const rumput = document.getElementById("rumput");
+            
+            // Atur Kemiringan (Landai = 10 deg, Curam = 25 deg) - Menggunakan nilai positif agar kiri naik
+            if (kemiringan === "landai") {
+                lereng.style.transform = "rotate(10deg)";
+            } else {
+                lereng.style.transform = "rotate(25deg)";
+            }
+
+            // Atur Tutupan (Rumput vs Gundul)
+            if (tutupan === "rumput") {
+                rumput.style.opacity = "1";
+            } else {
+                rumput.style.opacity = "0";
+            }
+
+            // Reset hasil dan gelas beker
+            resetHasil();
+        }
+
+        function resetHasil() {
+            document.getElementById("air-tampungan").style.height = "0%";
+            document.getElementById("air-tampungan").style.backgroundColor = "transparent";
+            
+            document.getElementById("hasil-massa").innerText = "0";
+            
+            const keruhEl = document.getElementById("hasil-keruh");
+            keruhEl.innerText = "-";
+            keruhEl.className = "font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-sm";
+            
+            document.getElementById("hasil-kondisi").innerText = "-";
+            document.getElementById("indikator-hasil").className = "absolute top-0 left-0 w-1 h-full bg-gray-300";
+
+            // Sembunyikan kerusakan tanah
+            document.querySelectorAll('.soil-damage').forEach(el => el.style.opacity = '0');
+        }
+
+        function buatHujan() {
+            const area = document.querySelector('.simulation-area');
+            const rainDrop = document.createElement('div');
+            rainDrop.classList.add('raindrop');
+            
+            // Posisi acak di atas lereng (Batas lereng kini ada di sisa 75% area kiri)
+            rainDrop.style.left = Math.random() * 75 + '%'; 
+            rainDrop.style.animationDuration = (Math.random() * 0.5 + 0.5) + 's';
+            
+            area.appendChild(rainDrop);
+
+            // Hapus setelah jatuh
+            setTimeout(() => {
+                rainDrop.remove();
+            }, 1000);
+        }
+
+        function jalankanSimulasi() {
+            if (isSimulating) return;
+            isSimulating = true;
+
+            const tutupan = document.getElementById("tutupan").value;
+            const kemiringan = document.getElementById("kemiringan").value;
+            const btn = document.getElementById("btn-simulasi");
+            const status = document.getElementById("status-simulasi");
+
+            // UI State saat loading
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Menyimulasikan...`;
+            btn.classList.add("opacity-75", "cursor-not-allowed");
+            
+            status.style.opacity = "1";
+            resetHasil();
+
+            // Mulai hujan
+            rainInterval = setInterval(buatHujan, 30);
+
+            // Tentukan Hasil Berdasarkan Aturan
+            let massa = 0;
+            let warnaAir = "";
+            let teksKeruh = "";
+            let kelasKeruh = "";
+            let kondisi = "";
+            let warnaIndikator = "";
+            let tingkatKerusakan = 0; // 0 = tidak rusak, 1 = sedang, 2 = parah
+
+            if (tutupan === "gundul" && kemiringan === "curam") {
+                massa = Math.floor(Math.random() * (150 - 100 + 1)) + 100; // 100-150g
+                warnaAir = "rgba(92, 64, 51, 0.9)"; // Cokelat pekat
+                teksKeruh = "Sangat Keruh";
+                kelasKeruh = "bg-red-100 text-red-700";
+                kondisi = "Hancur Parah (Erosi Tinggi)";
+                warnaIndikator = "bg-red-500";
+                tingkatKerusakan = 2;
+            } else if (tutupan === "gundul" && kemiringan === "landai") {
+                massa = Math.floor(Math.random() * (70 - 40 + 1)) + 40; 
+                warnaAir = "rgba(139, 101, 8, 0.75)"; // Cokelat sedang
+                teksKeruh = "Keruh";
+                kelasKeruh = "bg-orange-100 text-orange-700";
+                kondisi = "Sebagian Terkikis";
+                warnaIndikator = "bg-orange-500";
+                tingkatKerusakan = 1;
+            } else if (tutupan === "rumput" && kemiringan === "curam") {
+                massa = Math.floor(Math.random() * (25 - 10 + 1)) + 10; 
+                warnaAir = "rgba(205, 200, 177, 0.5)"; // Sedikit keruh
+                teksKeruh = "Sedikit Keruh";
+                kelasKeruh = "bg-yellow-100 text-yellow-700";
+                kondisi = "Utuh (Erosi Rendah)";
+                warnaIndikator = "bg-yellow-400";
+                tingkatKerusakan = 0;
+            } else if (tutupan === "rumput" && kemiringan === "landai") {
+                massa = Math.floor(Math.random() * (5 - 1 + 1)) + 1; 
+                warnaAir = "rgba(224, 255, 255, 0.6)"; // Biru jernih
+                teksKeruh = "Sangat Jernih";
+                kelasKeruh = "bg-green-100 text-green-700";
+                kondisi = "Sangat Utuh (Stabil)";
+                warnaIndikator = "bg-green-500";
+                tingkatKerusakan = 0;
+            }
+
+            // Simulasikan pengisian air & efek erosi
+            setTimeout(() => {
+                const beakerLiquid = document.getElementById("air-tampungan");
+                beakerLiquid.style.height = "70%";
+                beakerLiquid.style.backgroundColor = warnaAir;
+
+                // Tampilkan efek kerusakan pada tanah gundul
+                if (tingkatKerusakan > 0) {
+                    const damages = document.querySelectorAll('.soil-damage');
+                    damages[0].style.opacity = '1';
+                    if (tingkatKerusakan > 1) {
+                        damages[1].style.opacity = '1';
+                        damages[2].style.opacity = '1';
+                    }
+                }
+            }, 1000); // 1 detik setelah hujan dimulai
+
+            setTimeout(() => {
+                // Hentikan hujan
+                clearInterval(rainInterval);
+                
+                // Tampilkan Hasil ke DOM
+                document.getElementById("hasil-massa").innerText = massa;
+                
+                const keruhEl = document.getElementById("hasil-keruh");
+                keruhEl.innerText = teksKeruh;
+                keruhEl.className = `font-semibold px-3 py-1 rounded-full text-sm ${kelasKeruh}`;
+                
+                document.getElementById("hasil-kondisi").innerText = kondisi;
+                document.getElementById("indikator-hasil").className = `absolute top-0 left-0 w-1 h-full ${warnaIndikator}`;
+
+                // Kembalikan UI Button
+                btn.disabled = false;
+                btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Ulangi Simulasi`;
+                btn.classList.remove("opacity-75", "cursor-not-allowed");
+                status.style.opacity = "0";
+                
+                isSimulating = false;
+            }, 3500); // Durasi hujan 3.5 detik
+        }
+    </script>
+</body>
+</html>
